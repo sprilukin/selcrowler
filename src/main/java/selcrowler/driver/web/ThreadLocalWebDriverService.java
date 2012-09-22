@@ -7,20 +7,14 @@ import java.net.URL;
 
 public abstract class ThreadLocalWebDriverService implements WebDriverService {
 
-    private DriverServiceService driverServiceService;
-
     private ThreadLocal<WebDriver> webDriver = new ThreadLocal<WebDriver>() {
         @Override
         protected synchronized WebDriver initialValue() {
-            return createWebDriver(driverServiceService.getServiceUrl());
+            return createWebDriver();
         }
     };
 
-    public void setDriverServiceService(DriverServiceService driverServiceService) {
-        this.driverServiceService = driverServiceService;
-    }
-
-    protected abstract WebDriver createWebDriver(URL url);
+    protected abstract WebDriver createWebDriver();
 
     @Override
     public WebDriver getWebDriver() {
