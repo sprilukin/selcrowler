@@ -1,0 +1,24 @@
+<assembly>
+    <id>bundle</id>
+    <formats>
+        <!--<format>zip</format>-->
+        <format>dir</format>
+    </formats>
+    <dependencySets>
+        <dependencySet>
+        </dependencySet>
+    </dependencySets>
+</assembly>
+<!--<assembly>
+    <id>all</id>
+    <formats>
+        <format>jar</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <dependencySets>
+        <dependencySet>
+            <outputDirectory/>
+            <unpack>true</unpack>
+        </dependencySet>
+    </dependencySets>
+</assembly>-->
