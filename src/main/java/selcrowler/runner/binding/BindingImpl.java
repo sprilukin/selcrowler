@@ -45,16 +45,20 @@ public class BindingImpl implements Binding {
     }
 
     public void put(String name, Object value, Class<?> valueClass) {
+        if (value != null && !valueClass.isAssignableFrom(value.getClass())) {
+            throw new IllegalArgumentException();
+        }
+
         removeByName(name);
         getOrCreateMap(valueClass).put(name, value);
     }
 
-    public BindingImpl add(String name, Object value) {
+    public Binding add(String name, Object value) {
         this.put(name, value);
         return this;
     }
 
-    public BindingImpl add(String name, Object value, Class<?> valueClass) {
+    public Binding add(String name, Object value, Class<?> valueClass) {
         this.put(name, value, valueClass);
         return this;
     }

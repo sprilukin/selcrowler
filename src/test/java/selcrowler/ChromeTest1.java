@@ -12,9 +12,12 @@ import selcrowler.driver.service.ChromeDriverServiceService;
 import selcrowler.driver.service.DriverServiceService;
 import selcrowler.driver.web.ChromeWebDriverService;
 import selcrowler.runner.ScriptRunner;
+import selcrowler.runner.ScriptRunnerService;
 import selcrowler.runner.ThreadPoolScriptRunnerService;
 import selcrowler.runner.binding.Binding;
 import selcrowler.runner.binding.BindingImpl;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertTrue;
 
@@ -41,6 +44,10 @@ public class ChromeTest1 {
 
     @Test
     public void testGoogleSearch() throws Exception {
+
+        final AtomicInteger count = new AtomicInteger(0);
+        final int max = 8;
+
         ScriptRunner scriptRunner = new ScriptRunner() {
             @Override
             public void callback(WebDriver driver, Binding bindings) throws Exception {
@@ -61,23 +68,16 @@ public class ChromeTest1 {
                 assertTrue(driver.getTitle().startsWith("webdriver"));
 
                 System.out.println(Thread.currentThread().getName());
+
+                if (count.addAndGet(1) <= max) {
+                    ScriptRunnerService s = bindings.get(ScriptRunnerService.class);
+                    s.run(this, bindings);
+                    s.run(this, bindings);
+                }
             }
         };
 
         scriptRunnerService.run(scriptRunner, new BindingImpl());
-        scriptRunnerService.run(scriptRunner, new BindingImpl());
-        scriptRunnerService.run(scriptRunner, new BindingImpl());
-        scriptRunnerService.run(scriptRunner, new BindingImpl());
-        scriptRunnerService.run(scriptRunner, new BindingImpl());
-
-        scriptRunnerService.join();
-
-        scriptRunnerService.run(scriptRunner, new BindingImpl());
-        scriptRunnerService.run(scriptRunner, new BindingImpl());
-        scriptRunnerService.run(scriptRunner, new BindingImpl());
-        scriptRunnerService.run(scriptRunner, new BindingImpl());
-        scriptRunnerService.run(scriptRunner, new BindingImpl());
-
         scriptRunnerService.join();
     }
 }
