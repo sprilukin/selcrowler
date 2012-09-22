@@ -1,23 +1,23 @@
 package selcrowler.driver.service;
 
-import org.openqa.selenium.chrome.ChromeDriverService;
+import org.openqa.selenium.ie.InternetExplorerDriverService;
 
 import java.io.File;
 import java.io.IOException;
 
-public class ChromeDriverServiceService extends BaseLocalDriverServiceService {
+public class IEDriverServiceService extends BaseLocalDriverServiceService {
 
-    public ChromeDriverServiceService() {
+    public IEDriverServiceService() {
     }
 
-    public ChromeDriverServiceService(String pathToDriver) {
+    public IEDriverServiceService(String pathToDriver) {
         super(pathToDriver);
     }
 
     protected synchronized void start() throws IOException {
         if (service == null) {
             File file = new File(pathToDriver);
-            service = new ChromeDriverService.Builder()
+            service = new InternetExplorerDriverService.Builder()
                     .usingDriverExecutable(file)
                     .usingAnyFreePort()
                     .build();
