@@ -85,7 +85,7 @@ public class BindingImpl implements Binding {
     private Object getByName(String name) {
         for (Map.Entry<Class, Map<String, Object>> entry: bindingsMapByClass.entrySet()) {
             Map<String, Object> map = entry.getValue();
-            if (map != null) {
+            if (map != null && map.containsKey(name)) {
                 return map.get(name);
             }
         }

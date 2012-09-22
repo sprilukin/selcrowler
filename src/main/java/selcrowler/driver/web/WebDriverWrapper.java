@@ -1,13 +1,14 @@
 package selcrowler.driver.web;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
 import java.util.Set;
 
-public class WebDriverWrapper implements WebDriver {
+public class WebDriverWrapper implements WebDriver, JavascriptExecutor {
     private WebDriver wrappedWebDriver;
 
     public WebDriverWrapper(WebDriver wrappedWebDriver) {
@@ -77,5 +78,15 @@ public class WebDriverWrapper implements WebDriver {
     @Override
     public Options manage() {
         return wrappedWebDriver.manage();
+    }
+
+    @Override
+    public Object executeScript(String script, Object... args) {
+        return ((JavascriptExecutor)wrappedWebDriver).executeScript(script, args);
+    }
+
+    @Override
+    public Object executeAsyncScript(String script, Object... args) {
+        return ((JavascriptExecutor)wrappedWebDriver).executeAsyncScript(script, args);
     }
 }
