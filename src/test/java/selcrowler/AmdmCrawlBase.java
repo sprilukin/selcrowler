@@ -12,14 +12,21 @@ import selcrowler.runner.ScriptRunnerService;
 import selcrowler.runner.binding.Binding;
 import selcrowler.runner.binding.BindingImpl;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 
 public class AmdmCrawlBase {
 
     private static final Log log = LogFactory.getLog(AmdmCrawlChrome.class);
 
+    private static final String BASE_PATH = "d:\\music\\text\\z_selenium\\amdm";
     private static final String AMDM = "http://amdm.ru";
     private static final String SKIP_PAGINATION = "SKIP_PAGINATION";
+
+    private static final String FILE_NAME_FORBIDDEN_SYMBOLS = "[\\?]+";
+    private static final String FILE_NAME_FORBIDDEN_SYMBOLS_REPLACEMENT = "_";
 
     public static ScriptRunner getLetters = new ScriptRunner() {
         @Override
@@ -120,7 +127,41 @@ public class AmdmCrawlBase {
 
             String contents = driver.findElement(By.tagName("pre")).getText();
             log.debug(contents);
-            log.debug(String.format("/%s/%s/%s", bindings.get("letter"), bindings.get("artist"), bindings.get("song")));
+
+            Object letter = bindings.get("letter");
+            Object artist = bindings.get("artist");
+            Object song = bindings.get("song");
+            log.debug(String.format("/%s/%s/%s", letter, artist, song));
+
+            createDirIfNotExist(String.format("%s\\%s\\%s", BASE_PATH, letter, artist));
+            saveStringToFile(contents, String.format("%s\\%s\\%s\\%s.txt", BASE_PATH, letter, artist, song));
         }
     };
+
+    public static void saveStringToFile(String string, String path) throws IOException {
+        FileWriter fw = new FileWriter(removeIllegalCharacters(path));
+        fw.write(string);
+        fw.flush();
+        fw.close();
+    }
+
+    public static String removeIllegalCharacters(String fileName) {
+        return fileName != null
+                ? fileName.replaceAll(
+                FILE_NAME_FORBIDDEN_SYMBOLS,
+                FILE_NAME_FORBIDDEN_SYMBOLS_REPLACEMENT
+        )
+                : null;
+    }
+
+    public static void createDirIfNotExist(String dir) throws IOException {
+        File directory = new File(dir);
+
+        if (!directory.exists()) {
+            Boolean result = directory.mkdirs();
+            if (!result) {
+                throw new IOException("Could not create directory: " + dir);
+            }
+        }
+    }
 }
