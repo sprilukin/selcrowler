@@ -80,7 +80,7 @@
                     <configuration>
                         <archive>
                             <manifest>
-                                <mainClass>selcrowler.console.Runner</mainClass>
+                                <mainClass>selcrowler.console.Starter</mainClass>
                                 <addClasspath>true</addClasspath>
                             </manifest>
                         </archive>
@@ -91,7 +91,7 @@
                     <configuration>
                         <archive>
                             <manifest>
-                                <mainClass>selcrowler.console.Runner</mainClass>
+                                <mainClass>selcrowler.console.Starter</mainClass>
                             </manifest>
                         </archive>
                         <descriptors>
