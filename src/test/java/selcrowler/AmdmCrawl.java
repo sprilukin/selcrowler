@@ -57,12 +57,15 @@ public class AmdmCrawl {
         public void callback(WebDriver driver, Binding bindings) throws Exception {
             driver.get(AMDM);
 
+            ScriptRunnerService s = bindings.get(ScriptRunnerService.class);
             List<WebElement> letters = driver.findElements(By.cssSelector("table table td.chords a"));
             for (WebElement letter: letters) {
                 String path = letter.getAttribute("href");
-                ScriptRunnerService s = bindings.get(ScriptRunnerService.class);
-                s.run(getArtistsForLetter, new BindingImpl().add("path", path).add(SKIP_PAGINATION, Boolean.FALSE));
-                //break;
+                s.run(getArtistsForLetter, new BindingImpl()
+                        .add("path", path)
+                        .add("letter", letter.getText())
+                        .add(SKIP_PAGINATION, Boolean.FALSE));
+                break;
             }
         }
     };
@@ -90,20 +93,23 @@ public class AmdmCrawl {
                 for (WebElement element: anchors) {
                     Binding binding = new BindingImpl()
                             .add("path", element.getAttribute("href"))
+                            .add("letter", bindings.get("letter"))
                             .add(SKIP_PAGINATION, Boolean.TRUE);
 
                     srs.run(getArtistsForLetter, binding);
-                    //break;
+                    break;
                 }
             }
 
             List<WebElement> artists = driver.findElements(By.cssSelector("table.border a"));
             for (WebElement element: artists) {
                 Binding binding = new BindingImpl()
-                        .add("path", element.getAttribute("href"));
+                        .add("path", element.getAttribute("href"))
+                        .add("letter", bindings.get("letter"))
+                        .add("artist", element.getText());
 
                 srs.run(getSongsForArtist, binding);
-                //break;
+                break;
             }
         }
     };
@@ -122,8 +128,13 @@ public class AmdmCrawl {
             ScriptRunnerService srs = bindings.get(ScriptRunnerService.class);
 
             for (WebElement webElement: songs) {
-                srs.run(getSong, new BindingImpl().add("path", webElement.getAttribute("href")));
-                //break;
+                Binding binding = new BindingImpl()
+                        .add("path", webElement.getAttribute("href"))
+                        .add("letter", bindings.get("letter"))
+                        .add("artist", bindings.get("artist"))
+                        .add("song", webElement.getText());
+                srs.run(getSong, binding);
+                break;
             }
         }
     };
@@ -137,8 +148,9 @@ public class AmdmCrawl {
 
             driver.get(path);
 
-            String contents = (String)((JavascriptExecutor)driver).executeScript("return document.getElementsByTagName('pre')[0].innerHTML;");
+            String contents = driver.findElement(By.tagName("pre")).getText();
             log.debug(contents);
+            log.debug(String.format("/%s/%s/%s", bindings.get("letter"), bindings.get("artist"), bindings.get("song")));
         }
     };
 
