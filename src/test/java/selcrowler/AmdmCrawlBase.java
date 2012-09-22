@@ -4,55 +4,24 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import selcrowler.driver.service.ChromeDriverServiceService;
-import selcrowler.driver.service.DriverServiceService;
-import selcrowler.driver.web.ChromeWebDriverService;
 import selcrowler.runner.ScriptRunner;
 import selcrowler.runner.ScriptRunnerService;
-import selcrowler.runner.ThreadPoolScriptRunnerService;
 import selcrowler.runner.binding.Binding;
 import selcrowler.runner.binding.BindingImpl;
 
-import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertTrue;
+public class AmdmCrawlBase {
 
-public class AmdmCrawl {
-    private static final Log log = LogFactory.getLog(AmdmCrawl.class);
+    private static final Log log = LogFactory.getLog(AmdmCrawlChrome.class);
 
-    private static ThreadPoolScriptRunnerService scriptRunnerService;
-    private static DriverServiceService service;
+    private static final String AMDM = "http://amdm.ru";
+    private static final String SKIP_PAGINATION = "SKIP_PAGINATION";
 
-    @BeforeClass
-    public static void createAndStartService() throws Exception {
-        service = new ChromeDriverServiceService("d:\\chromedriver.exe");
-
-        ChromeWebDriverService driver = new ChromeWebDriverService();
-        driver.setDriverServiceService(service);
-        driver.setCommandLineArguments(Arrays.asList("--disable-extensions", "--disable-images"));
-
-        scriptRunnerService = new ThreadPoolScriptRunnerService();
-        scriptRunnerService.setThreadsCount(2);
-        scriptRunnerService.setWebDriverService(driver);
-    }
-
-    @AfterClass
-    public static void createAndStopService() {
-        service.stop();
-    }
-
-    private final String AMDM = "http://amdm.ru";
-    final String SKIP_PAGINATION = "SKIP_PAGINATION";
-
-    private ScriptRunner getLetters = new ScriptRunner() {
+    public static ScriptRunner getLetters = new ScriptRunner() {
         @Override
         public void callback(WebDriver driver, Binding bindings) throws Exception {
             driver.get(AMDM);
@@ -70,7 +39,7 @@ public class AmdmCrawl {
         }
     };
 
-    private ScriptRunner getArtistsForLetter = new ScriptRunner() {
+    public static ScriptRunner getArtistsForLetter = new ScriptRunner() {
 
         @Override
         public void callback(WebDriver driver, Binding bindings) throws Exception {
@@ -114,7 +83,7 @@ public class AmdmCrawl {
         }
     };
 
-    private ScriptRunner getSongsForArtist = new ScriptRunner() {
+    public static ScriptRunner getSongsForArtist = new ScriptRunner() {
 
         @Override
         public void callback(WebDriver driver, Binding bindings) throws Exception {
@@ -124,7 +93,8 @@ public class AmdmCrawl {
 
             driver.get(path);
 
-            List<WebElement> songs = driver.findElements(By.cssSelector("table[width='600'] a[target='_blank']"));
+            WebElement table = driver.findElement(By.cssSelector("table[width='600']"));
+            List<WebElement> songs = table.findElements(By.cssSelector("a[target='_blank']"));
             ScriptRunnerService srs = bindings.get(ScriptRunnerService.class);
 
             for (WebElement webElement: songs) {
@@ -139,7 +109,7 @@ public class AmdmCrawl {
         }
     };
 
-    private ScriptRunner getSong = new ScriptRunner() {
+    public static ScriptRunner getSong = new ScriptRunner() {
 
         @Override
         public void callback(WebDriver driver, Binding bindings) throws Exception {
@@ -153,10 +123,4 @@ public class AmdmCrawl {
             log.debug(String.format("/%s/%s/%s", bindings.get("letter"), bindings.get("artist"), bindings.get("song")));
         }
     };
-
-    @Test
-    public void testGoogleSearch() throws Exception {
-        scriptRunnerService.run(getLetters, new BindingImpl());
-        scriptRunnerService.join();
-    }
 }

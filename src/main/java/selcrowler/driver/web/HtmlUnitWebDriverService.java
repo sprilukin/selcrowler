@@ -5,7 +5,7 @@ import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 
 public class HtmlUnitWebDriverService extends ThreadLocalWebDriverService {
 
-    private boolean javaScriptEnabled = true;
+    private boolean javaScriptEnabled = false;
 
     public void setJavaScriptEnabled(boolean javaScriptEnabled) {
         this.javaScriptEnabled = javaScriptEnabled;
