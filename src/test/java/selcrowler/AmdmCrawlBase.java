@@ -25,7 +25,7 @@ public class AmdmCrawlBase {
     private static final String AMDM = "http://amdm.ru";
     private static final String SKIP_PAGINATION = "SKIP_PAGINATION";
 
-    private static final String FILE_NAME_FORBIDDEN_SYMBOLS = "[\\?,\\:]+";
+    private static final String FILE_NAME_FORBIDDEN_SYMBOLS = "[\\?,\"\\\\/]+";
     private static final String FILE_NAME_FORBIDDEN_SYMBOLS_REPLACEMENT = "_";
 
     public static ScriptRunner getLetters = new ScriptRunner() {
@@ -35,14 +35,16 @@ public class AmdmCrawlBase {
 
             ScriptRunnerService s = bindings.get(ScriptRunnerService.class);
             List<WebElement> letters = driver.findElements(By.cssSelector("table table td.chords a"));
-            for (WebElement letter: letters) {
-                String path = letter.getAttribute("href");
+            //for (WebElement letter: letters) {
+            for (int i = 4; i <= 6; i++) {
+                String path = letters.get(i).getAttribute("href");
                 s.run(getArtistsForLetter, new BindingImpl()
                         .add("path", path)
-                        .add("letter", letter.getText())
+                        .add("letter", letters.get(i).getText())
                         .add(SKIP_PAGINATION, Boolean.FALSE));
-                break;
+                //break;
             }
+            //}
         }
     };
 
@@ -73,7 +75,7 @@ public class AmdmCrawlBase {
                             .add(SKIP_PAGINATION, Boolean.TRUE);
 
                     srs.run(getArtistsForLetter, binding);
-                    break;
+                    //break;
                 }
             }
 
@@ -85,7 +87,7 @@ public class AmdmCrawlBase {
                         .add("artist", element.getText());
 
                 srs.run(getSongsForArtist, binding);
-                break;
+                //break;
             }
         }
     };
@@ -105,13 +107,21 @@ public class AmdmCrawlBase {
             ScriptRunnerService srs = bindings.get(ScriptRunnerService.class);
 
             for (WebElement webElement: songs) {
-                Binding binding = new BindingImpl()
-                        .add("path", webElement.getAttribute("href"))
-                        .add("letter", bindings.get("letter"))
-                        .add("artist", bindings.get("artist"))
-                        .add("song", webElement.getText());
-                srs.run(getSong, binding);
-                break;
+                String letter = bindings.get("letter");
+                String artist = bindings.get("artist");
+                String song = webElement.getText();
+                String href = webElement.getAttribute("href");
+
+                File file = new File(getFullPath(letter, artist, song, href));
+                if (!file.exists()) {
+                    Binding binding = new BindingImpl()
+                            .add("path", href)
+                            .add("letter", letter).add("artist", artist)
+                            .add("song", song);
+                    srs.run(getSong, binding);
+                } else {
+                    log.debug(String.format("/%s/%s/%s.txt already exists", letter, artist, song));
+                }
             }
         }
     };
@@ -128,18 +138,22 @@ public class AmdmCrawlBase {
             String contents = driver.findElement(By.tagName("pre")).getText();
             //log.debug(contents);
 
-            Object letter = bindings.get("letter");
-            Object artist = bindings.get("artist");
-            Object song = bindings.get("song");
+            String letter = bindings.get("letter");
+            String artist = bindings.get("artist");
+            String song = bindings.get("song");
             log.debug(String.format("/%s/%s/%s", letter, artist, song));
 
             createDirIfNotExist(String.format("%s\\%s\\%s", BASE_PATH, letter, artist));
-            saveStringToFile(contents, String.format("%s\\%s\\%s\\%s.txt", BASE_PATH, letter, artist, song));
+            saveStringToFile(contents, getFullPath(letter, artist, song, path));
         }
     };
 
+    private static String getFullPath(String letter, String artist, String song, String href) {
+        return String.format("%s\\%s\\%s\\%s-%s.txt", BASE_PATH, letter, artist, removeIllegalCharacters(song), String.valueOf(href.hashCode()));
+    }
+
     public static void saveStringToFile(String string, String path) throws IOException {
-        FileWriter fw = new FileWriter(removeIllegalCharacters(path));
+        FileWriter fw = new FileWriter(path);
         fw.write(string);
         fw.flush();
         fw.close();
