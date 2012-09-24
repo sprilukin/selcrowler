@@ -25,7 +25,7 @@ public class AmdmCrawlBase {
     private static final String AMDM = "http://amdm.ru";
     private static final String SKIP_PAGINATION = "SKIP_PAGINATION";
 
-    private static final String FILE_NAME_FORBIDDEN_SYMBOLS = "[\\?]+";
+    private static final String FILE_NAME_FORBIDDEN_SYMBOLS = "[\\?,\\:]+";
     private static final String FILE_NAME_FORBIDDEN_SYMBOLS_REPLACEMENT = "_";
 
     public static ScriptRunner getLetters = new ScriptRunner() {
@@ -57,12 +57,12 @@ public class AmdmCrawlBase {
 
             ScriptRunnerService srs = bindings.get(ScriptRunnerService.class);
             if (!bindings.get(Boolean.class, SKIP_PAGINATION)) {
-                List<WebElement> anchors = driver.findElements(By.cssSelector("table[width='790'] td[valign='top'] > a"));
+                List<WebElement> anchors = driver.findElements(By.cssSelector("td[valign='top'] > a"));
                 CollectionUtils.filter(anchors, new Predicate() {
                     @Override
                     public boolean evaluate(Object object) {
                         String href = ((WebElement) object).getAttribute("href");
-                        return href.matches(".*/chords/[\\d]+/?page=[\\d]+") && !href.endsWith("/?page=0");
+                        return href.matches("^.*/chords/[\\d]+/\\?page=[\\d]+$") && !href.endsWith("/?page=0");
                     }
                 });
 
@@ -126,7 +126,7 @@ public class AmdmCrawlBase {
             driver.get(path);
 
             String contents = driver.findElement(By.tagName("pre")).getText();
-            log.debug(contents);
+            //log.debug(contents);
 
             Object letter = bindings.get("letter");
             Object artist = bindings.get("artist");
