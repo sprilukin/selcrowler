@@ -17,18 +17,21 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-public class AmdmCrawlBase {
+public abstract class AmdmCrawlBase {
 
     private static final Log log = LogFactory.getLog(AmdmCrawlChrome.class);
-
-    private static final String BASE_PATH = "d:\\music\\text\\z_selenium\\amdm";
+    public static final String BASE_PATH = "d:\\music\\text\\z_selenium\\amdm";
     private static final String AMDM = "http://amdm.ru";
     private static final String SKIP_PAGINATION = "SKIP_PAGINATION";
 
     private static final String FILE_NAME_FORBIDDEN_SYMBOLS = "[\\?,\"\\\\/]+";
     private static final String FILE_NAME_FORBIDDEN_SYMBOLS_REPLACEMENT = "_";
 
-    public static ScriptRunner getLetters = new ScriptRunner() {
+    protected String getBasePath() {
+        return BASE_PATH;
+    }
+
+    public ScriptRunner getLetters = new ScriptRunner() {
         @Override
         public void callback(WebDriver driver, Binding bindings) throws Exception {
             driver.get(AMDM);
@@ -36,7 +39,7 @@ public class AmdmCrawlBase {
             ScriptRunnerService s = bindings.get(ScriptRunnerService.class);
             List<WebElement> letters = driver.findElements(By.cssSelector("table table td.chords a"));
             //for (WebElement letter: letters) {
-            for (int i = 4; i <= 6; i++) {
+            for (int i = 0; i <= 0; i++) {
                 String path = letters.get(i).getAttribute("href");
                 s.run(getArtistsForLetter, new BindingImpl()
                         .add("path", path)
@@ -48,7 +51,7 @@ public class AmdmCrawlBase {
         }
     };
 
-    public static ScriptRunner getArtistsForLetter = new ScriptRunner() {
+    public ScriptRunner getArtistsForLetter = new ScriptRunner() {
 
         @Override
         public void callback(WebDriver driver, Binding bindings) throws Exception {
@@ -92,7 +95,7 @@ public class AmdmCrawlBase {
         }
     };
 
-    public static ScriptRunner getSongsForArtist = new ScriptRunner() {
+    public ScriptRunner getSongsForArtist = new ScriptRunner() {
 
         @Override
         public void callback(WebDriver driver, Binding bindings) throws Exception {
@@ -126,7 +129,7 @@ public class AmdmCrawlBase {
         }
     };
 
-    public static ScriptRunner getSong = new ScriptRunner() {
+    public ScriptRunner getSong = new ScriptRunner() {
 
         @Override
         public void callback(WebDriver driver, Binding bindings) throws Exception {
@@ -143,13 +146,15 @@ public class AmdmCrawlBase {
             String song = bindings.get("song");
             log.debug(String.format("/%s/%s/%s", letter, artist, song));
 
-            createDirIfNotExist(String.format("%s\\%s\\%s", BASE_PATH, letter, artist));
+            createDirIfNotExist(String.format("%s\\%s\\%s", getBasePath(), letter, artist));
             saveStringToFile(contents, getFullPath(letter, artist, song, path));
         }
     };
 
-    private static String getFullPath(String letter, String artist, String song, String href) {
-        return String.format("%s\\%s\\%s\\%s-%s.txt", BASE_PATH, letter, artist, removeIllegalCharacters(song), String.valueOf(href.hashCode()));
+    private String getFullPath(String letter, String artist, String song, String href) {
+        return String.format("%s\\%s\\%s\\%s-%s.txt", getBasePath(),
+                removeIllegalCharacters(letter), removeIllegalCharacters(artist), removeIllegalCharacters(song),
+                String.valueOf(href.hashCode()));
     }
 
     public static void saveStringToFile(String string, String path) throws IOException {

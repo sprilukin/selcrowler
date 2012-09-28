@@ -46,13 +46,21 @@ public class AnhttpclientDriver implements WebDriver, /*JavascriptExecutor,*/
 
     public static final String USER_AGENT_HTTP_HEADER = "User-Agent";
 
+    private String encoding = "UTF-8";
     private WebBrowser webBrowser;
     private ThreadLocal<WebResponse> webResponse = new ThreadLocal<WebResponse>();
     private ThreadLocal<Document> document = new ThreadLocal<Document>();
 
+    public AnhttpclientDriver() {
+        this((BrowserVersion)null);
+    }
+
     public AnhttpclientDriver(BrowserVersion browserVersion) {
         webBrowser = new DefaultWebBrowser(true);
-        webBrowser.addHeader(USER_AGENT_HTTP_HEADER, browserVersion.getUserAgent());
+
+        if (browserVersion != null) {
+            webBrowser.addHeader(USER_AGENT_HTTP_HEADER, browserVersion.getUserAgent());
+        }
     }
 
     public AnhttpclientDriver(Capabilities capabilities) {
@@ -72,6 +80,10 @@ public class AnhttpclientDriver implements WebDriver, /*JavascriptExecutor,*/
                 }
             }
         }
+    }
+
+    public void setEncoding(String encoding) {
+        this.encoding = encoding;
     }
 
     // Package visibility for testing
@@ -138,10 +150,22 @@ public class AnhttpclientDriver implements WebDriver, /*JavascriptExecutor,*/
 
     public void get(String url) {
         try {
-            webResponse.set(webBrowser.getResponse(url));
+            webResponse.set(webBrowser.getResponse(completeUrl(url), encoding));
             document.set(Jsoup.parse(webResponse.get().getText()));
         } catch (IOException e) {
             throw new WebDriverException(e);
+        }
+    }
+
+    private String completeUrl(String url) {
+        if (url.startsWith("/")) {
+            try {
+                return "http://" + webResponse.get().getUrl().getHost() + url;
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            return url;
         }
     }
 
@@ -244,13 +268,11 @@ public class AnhttpclientDriver implements WebDriver, /*JavascriptExecutor,*/
     }
 
     public WebElement findElementByTagName(String name) {
-        //TODO
-        return null;
+        return new AnhttpclientWebElement(document.get().getElementsByTag(name).first(), this);
     }
 
     public List<WebElement> findElementsByTagName(String using) {
-        //TODO
-        return null;
+        return AnhttpclientWebElement.getWebElements(document.get().getElementsByTag(using), this);
     }
 
     public WebElement findElementByXPath(String selector) {
