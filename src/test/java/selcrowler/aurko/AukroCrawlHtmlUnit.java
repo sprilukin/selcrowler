@@ -22,6 +22,8 @@ public class AukroCrawlHtmlUnit extends AukroCrawlBase {
 
     @Test
     public void testGoogleSearch() throws Exception {
+        long startTime = System.currentTimeMillis();
         scriptRunnerService.run(getTitles, new BindingImpl());
+        System.out.println("Time: " + (System.currentTimeMillis() - startTime));
     }
 }
