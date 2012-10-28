@@ -41,7 +41,10 @@ public class BindingImpl implements Binding {
     }
 
     public void put(String name, Object value) {
-        put(name, value, value.getClass());
+        //No need to put null values
+        if (value != null) {
+            put(name, value, value.getClass());
+        }
     }
 
     public void put(String name, Object value, Class<?> valueClass) {
