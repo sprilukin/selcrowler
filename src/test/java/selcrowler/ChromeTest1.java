@@ -11,6 +11,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import selcrowler.driver.service.ChromeDriverServiceService;
 import selcrowler.driver.service.DriverServiceService;
 import selcrowler.driver.web.ChromeWebDriverService;
+import selcrowler.runner.AsyncScriptRunnerService;
 import selcrowler.runner.ScriptRunner;
 import selcrowler.runner.ScriptRunnerService;
 import selcrowler.runner.ThreadPoolScriptRunnerService;
@@ -22,7 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.Assert.assertTrue;
 
 public class ChromeTest1 {
-    private static ThreadPoolScriptRunnerService scriptRunnerService;
+    private static AsyncScriptRunnerService scriptRunnerService;
     private static DriverServiceService service;
 
     @BeforeClass
@@ -32,7 +33,7 @@ public class ChromeTest1 {
         ChromeWebDriverService driver = new ChromeWebDriverService();
         driver.setDriverServiceService(service);
 
-        scriptRunnerService = new ThreadPoolScriptRunnerService();
+        scriptRunnerService = new AsyncScriptRunnerService();
         scriptRunnerService.setThreadsCount(4);
         scriptRunnerService.setWebDriverService(driver);
     }
@@ -49,7 +50,6 @@ public class ChromeTest1 {
         final int max = 8;
 
         ScriptRunner scriptRunner = new ScriptRunner() {
-            @Override
             public void callback(WebDriver driver, Binding bindings) throws Exception {
                 driver.get("http://www.google.com");
 
