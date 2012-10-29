@@ -6,13 +6,14 @@ import org.junit.Test;
 import selcrowler.driver.service.ChromeDriverServiceService;
 import selcrowler.driver.service.DriverServiceService;
 import selcrowler.driver.web.ChromeWebDriverService;
+import selcrowler.runner.AsyncScriptRunnerService;
 import selcrowler.runner.ThreadPoolScriptRunnerService;
 import selcrowler.runner.binding.BindingImpl;
 
 import java.util.Arrays;
 
 public class AmdmCrawlChrome extends AmdmCrawlBase {
-    private static ThreadPoolScriptRunnerService scriptRunnerService;
+    private static AsyncScriptRunnerService scriptRunnerService;
     private static DriverServiceService service;
 
     @BeforeClass
@@ -23,7 +24,7 @@ public class AmdmCrawlChrome extends AmdmCrawlBase {
         driver.setDriverServiceService(service);
         driver.setCommandLineArguments(Arrays.asList("--disable-extensions", "--disable-images"));
 
-        scriptRunnerService = new ThreadPoolScriptRunnerService();
+        scriptRunnerService = new AsyncScriptRunnerService();
         scriptRunnerService.setThreadsCount(2);
         scriptRunnerService.setWebDriverService(driver);
     }

@@ -14,6 +14,7 @@ public class SingleThreadScriptRunnerService extends BaseScriptRunnerService {
             scriptRunner.callback(webDriverService.getWebDriver(), binding);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            binding.put(EXCEPTION_KEY, e);
         }
     }
 }

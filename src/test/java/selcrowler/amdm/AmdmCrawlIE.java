@@ -6,11 +6,12 @@ import org.junit.Test;
 import selcrowler.driver.service.DriverServiceService;
 import selcrowler.driver.service.IEDriverServiceService;
 import selcrowler.driver.web.IEWebDriverService;
+import selcrowler.runner.AsyncScriptRunnerService;
 import selcrowler.runner.ThreadPoolScriptRunnerService;
 import selcrowler.runner.binding.BindingImpl;
 
 public class AmdmCrawlIE extends AmdmCrawlBase {
-    private static ThreadPoolScriptRunnerService scriptRunnerService;
+    private static AsyncScriptRunnerService scriptRunnerService;
     private static DriverServiceService service;
 
     @BeforeClass
@@ -20,7 +21,7 @@ public class AmdmCrawlIE extends AmdmCrawlBase {
         IEWebDriverService driver = new IEWebDriverService();
         driver.setDriverServiceService(service);
 
-        scriptRunnerService = new ThreadPoolScriptRunnerService();
+        scriptRunnerService = new AsyncScriptRunnerService();
         scriptRunnerService.setThreadsCount(2);
         scriptRunnerService.setWebDriverService(driver);
     }

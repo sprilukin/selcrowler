@@ -4,17 +4,18 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import selcrowler.driver.web.FireFoxWebDriverService;
 import selcrowler.driver.web.WebDriverService;
+import selcrowler.runner.AsyncScriptRunnerService;
 import selcrowler.runner.ThreadPoolScriptRunnerService;
 import selcrowler.runner.binding.BindingImpl;
 
 public class AmdmCrawlFireFox extends AmdmCrawlBase {
-    private static ThreadPoolScriptRunnerService scriptRunnerService;
+    private static AsyncScriptRunnerService scriptRunnerService;
 
     @BeforeClass
     public static void createAndStartService() throws Exception {
         WebDriverService driver = new FireFoxWebDriverService();
 
-        scriptRunnerService = new ThreadPoolScriptRunnerService();
+        scriptRunnerService = new AsyncScriptRunnerService();
         scriptRunnerService.setThreadsCount(2);
         scriptRunnerService.setWebDriverService(driver);
     }
