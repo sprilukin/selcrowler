@@ -83,7 +83,8 @@ public abstract class AukroCrawlBase {
             //for (int i = 0; i <= 0; i++) {
                 WebElement titleSpan = item.findElement(By.cssSelector("a.iTitle span"));
                 WebElement imgUrl = item.findElement(By.cssSelector("a.iImg"));
-                log.debug(String.format("[%s], [%s]", titleSpan.getText(), imgUrl.getAttribute("data-img")));
+                WebElement price = item.findElement(By.cssSelector("span.iPriceR"));
+                log.debug(String.format("[%s], [%s], [%s]", titleSpan.getText(), imgUrl.getAttribute("data-img"), price.getText()));
             }
         }
     };
