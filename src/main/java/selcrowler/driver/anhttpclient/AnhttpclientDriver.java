@@ -9,6 +9,7 @@ import org.apache.commons.collections.Transformer;
 import org.apache.http.impl.cookie.BasicClientCookie;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Cookie;
@@ -250,7 +251,8 @@ public class AnhttpclientDriver implements WebDriver, /*JavascriptExecutor,*/
     }
 
     public WebElement findElementByCssSelector(String using) {
-        return new AnhttpclientWebElement(document.get().select(using).first(), this);
+        Element first = document.get().select(using).first();
+        return first != null ? new AnhttpclientWebElement(first, this) : null;
     }
 
     public List<WebElement> findElementsByCssSelector(String using) {
