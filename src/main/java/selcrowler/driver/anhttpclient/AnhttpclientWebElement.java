@@ -108,7 +108,8 @@ public class AnhttpclientWebElement implements WrapsDriver,
 
     @Override
     public WebElement findElementByCssSelector(String using) {
-        return new AnhttpclientWebElement(element.select(using).first(), driver);
+        final Element first = element.select(using).first();
+        return first != null ? new AnhttpclientWebElement(first, driver) : null;
     }
 
     @Override
